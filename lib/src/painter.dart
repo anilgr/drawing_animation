@@ -36,7 +36,7 @@ class PaintedPainter extends PathPainter {
             : (new Paint()
               ..color = segment.color
               ..style = PaintingStyle.stroke
-              ..strokeCap = StrokeCap.square
+              ..strokeCap = StrokeCap.round
               ..strokeWidth = segment.strokeWidth);
         canvas.drawPath(segment.path, paint);
       });
@@ -76,7 +76,7 @@ class AllAtOncePainter extends PathPainter {
             : (new Paint()
               ..color = segment.color
               ..style = PaintingStyle.stroke
-              ..strokeCap = StrokeCap.square
+              ..strokeCap = StrokeCap.round
               ..strokeWidth = segment.strokeWidth);
         canvas.drawPath(subPath, paint);
       });
@@ -168,7 +168,7 @@ class OneByOnePainter extends PathPainter {
               // ..color = (segment.relativeIndex == 0 && segment.pathIndex== 0) ? Colors.red : ((segment.relativeIndex == 1) ? Colors.blue : segment.color)
               ..color = segment.color
               ..style = PaintingStyle.stroke
-              ..strokeCap = StrokeCap.square
+              ..strokeCap = StrokeCap.round
               ..strokeWidth = segment.strokeWidth);
         canvas.drawPath(segment.path, paint);
       });
