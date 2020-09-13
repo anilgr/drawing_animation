@@ -5,6 +5,7 @@ import 'painter.dart';
 import 'parser.dart';
 
 class PathPainterBuilder {
+  String letterName;//kn project requirement: 
   PathPainterBuilder([LineAnimation lineAnimation]) {
     this.lineAnimation = lineAnimation;
   }
@@ -21,13 +22,13 @@ class PathPainterBuilder {
     switch (lineAnimation) {
       case LineAnimation.oneByOne:
         return OneByOnePainter(animation, pathSegments, customDimensions,
-            paints, onFinishFrame, scaleToViewport, debugOptions);
+            paints, onFinishFrame, scaleToViewport, debugOptions, this.letterName);
       case LineAnimation.allAtOnce:
         return AllAtOncePainter(animation, pathSegments, customDimensions,
-            paints, onFinishFrame, scaleToViewport, debugOptions);
+            paints, onFinishFrame, scaleToViewport, debugOptions, this.letterName);
       default:
         return PaintedPainter(animation, pathSegments, customDimensions, paints,
-            onFinishFrame, scaleToViewport, debugOptions);
+            onFinishFrame, scaleToViewport, debugOptions, this.letterName);
     }
   }
 
@@ -58,5 +59,9 @@ class PathPainterBuilder {
 
   void setPathSegments(List<PathSegment> pathSegments) {
     this.pathSegments = pathSegments;
+  }
+//kn project requirement: setter for letter name
+  void setLetterName(String letterName) {
+    this.letterName = letterName;
   }
 }

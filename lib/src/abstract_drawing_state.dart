@@ -12,6 +12,8 @@ import 'path_order.dart';
 
 /// Base class for _AnimatedDrawingState and _AnimatedDrawingWithTickerState
 abstract class AbstractAnimatedDrawingState extends State<AnimatedDrawing> {
+  String letterName;
+
   AbstractAnimatedDrawingState() {
     this.onFinishAnimation = onFinishAnimationDefault;
   }
@@ -152,6 +154,7 @@ abstract class AbstractAnimatedDrawingState extends State<AnimatedDrawing> {
     PathPainterBuilder builder =
         preparePathPainterBuilder(this.widget.lineAnimation);
     builder.setPathSegments(this.pathSegmentsToAnimate);
+    builder.setLetterName(this.letterName);//kn project requirement: 
     return builder.build();
   }
 
@@ -159,6 +162,7 @@ abstract class AbstractAnimatedDrawingState extends State<AnimatedDrawing> {
     if (pathSegmentsToPaintAsBackground.isEmpty) return null;
     PathPainterBuilder builder = preparePathPainterBuilder();
     builder.setPathSegments(this.pathSegmentsToPaintAsBackground);
+    builder.setLetterName(this.letterName);//kn project requirement: 
     return builder.build();
   }
 
@@ -292,6 +296,7 @@ abstract class AbstractAnimatedDrawingState extends State<AnimatedDrawing> {
         this.widget.paths.addAll(parser.getPaths());
         //corresponding segments
         this.pathSegments = parser.getPathSegments();
+        this.letterName = parser.getLetterName();//kn project requirement: 
         this.assetPath = this.widget.assetPath;
       });
     });

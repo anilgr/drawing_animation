@@ -21,9 +21,9 @@ class PaintedPainter extends PathPainter {
       List<Paint> paints,
       PaintedSegmentCallback onFinishCallback,
       bool scaleToViewport,
-      DebugOptions debugOptions)
+      DebugOptions debugOptions, String letterName)
       : super(animation, pathSegments, customDimensions, paints,
-            onFinishCallback, scaleToViewport, debugOptions);
+            onFinishCallback, scaleToViewport, debugOptions, letterName);
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -56,9 +56,9 @@ class AllAtOncePainter extends PathPainter {
       List<Paint> paints,
       PaintedSegmentCallback onFinishCallback,
       bool scaleToViewport,
-      DebugOptions debugOptions)
+      DebugOptions debugOptions, String letterName)
       : super(animation, pathSegments, customDimensions, paints,
-            onFinishCallback, scaleToViewport, debugOptions);
+            onFinishCallback, scaleToViewport, debugOptions, letterName);
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -95,10 +95,11 @@ class OneByOnePainter extends PathPainter {
       List<Paint> paints,
       PaintedSegmentCallback onFinishCallback,
       bool scaleToViewport,
-      DebugOptions debugOptions)
+      DebugOptions debugOptions,
+      String letterName)
       : this.totalPathSum = 0,
         super(animation, pathSegments, customDimensions, paints,
-            onFinishCallback, scaleToViewport, debugOptions) {
+            onFinishCallback, scaleToViewport, debugOptions, letterName) {
     if (this.pathSegments != null) {
       this.pathSegments.forEach((e) => this.totalPathSum += e.length);
     }
@@ -167,6 +168,7 @@ class OneByOnePainter extends PathPainter {
               //TODO Debug disappearing first lineSegment
               // ..color = (segment.relativeIndex == 0 && segment.pathIndex== 0) ? Colors.red : ((segment.relativeIndex == 1) ? Colors.blue : segment.color)
               ..color = segment.color
+              ..imageFilter = ui.ImageFilter.blur(sigmaX:0.5, sigmaY:0.5)
               ..style = PaintingStyle.stroke
               ..strokeCap = StrokeCap.round
               ..strokeWidth = segment.strokeWidth);
@@ -193,6 +195,7 @@ class OneByOnePainter extends PathPainter {
 
 /// Abstract implementation of painting a list of [PathSegment] elements to a canvas
 abstract class PathPainter extends CustomPainter {
+  String letterName;   //kn project requirement:
   PathPainter(
       this.animation,
       this.pathSegments,
@@ -200,7 +203,8 @@ abstract class PathPainter extends CustomPainter {
       this.paints,
       this.onFinishCallback,
       this.scaleToViewport,
-      this.debugOptions)
+      this.debugOptions,
+      this.letterName)
       : canPaint = false,
         super(repaint: animation) {
     if (this.pathSegments != null) {
@@ -341,6 +345,19 @@ abstract class PathPainter extends CustomPainter {
       ddx = ddy = dy;
     } else if (dy == 0) {
       ddx = ddy = dx;
+    }
+
+    //kn project reequirement: if there is letter name passed to the painter modify the scaling factor
+    if(this.letterName != null)
+    {
+      var textpainter = TextPainter(
+        textDirection: TextDirection.rtl,
+        text:TextSpan(text: this.letterName)
+      );
+      textpainter.layout();
+      double temp_ddx = ddx;
+      ddx = (ddx/25)*textpainter.width;
+      ddy = (ddx/temp_ddx)*ddy;
     }
     return _ScaleFactor(ddx, ddy);
   }
