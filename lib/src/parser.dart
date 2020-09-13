@@ -31,6 +31,7 @@ class SvgParser {
           "Only hex color format currently supported. String:  $cStr");
     }
   }
+  
 
   //Extract segments of each path and create [PathSegment] representation
   void addPathSegments(Path path, int index, double strokeWidth, Color color) {
@@ -62,9 +63,39 @@ class SvgParser {
         .findAllElements("path")
         .map((node) => node.attributes)
         .forEach((attributes) {
+
+          
+        //parse transformation attribute and get translate values if present. Which then be used as offset to moveTo in path.
+        List<double> translateValues = List<double>();
+        var tranformElement = attributes.firstWhere(
+            (attr) => attr.name.local == "transform",
+            orElse: () => null);
+        if (tranformElement != null) {
+          RegExp exp = RegExp(r"translate\(([^;]+)\)");
+          Match match = exp.firstMatch(tranformElement.value);
+          List<String> values = match.group(1).split(" "); //list will have dx at position 0 and dy at position 1 as string;  
+          values.forEach((value){
+              // print("printing the parsed translate value" + translateValues.toString());
+              translateValues.add(double.parse(value));
+          });
+        }
+
       var dPath = attributes.firstWhere((attr) => attr.name.local == "d",
           orElse: () => null);
       if (dPath != null) {
+
+        //add translate offset values to the path.
+        if(translateValues != null && translateValues.isNotEmpty){
+          dPath.value = dPath.value.replaceFirstMapped(RegExp(r"M([^a-zA-Z]+),([^a-zA-Z]+)"), (match){
+            // print(match.toString());
+            var x = double.parse(match.group(1)) + translateValues[0];
+            var y = double.parse(match.group(2)) + translateValues[1];
+            return 'M$x,$y';
+          });
+        }
+        // print(dPath.value);
+
+
         Path path = new Path();
         writeSvgPathDataToPath(dPath.value, new PathModifier(path));
 
