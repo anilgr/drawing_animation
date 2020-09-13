@@ -12,6 +12,10 @@ class SvgParser {
   /// Each [PathSegment] represents a continuous Path element of the parent Path
   final List<PathSegment> _pathSegments = List<PathSegment>();
   List<Path> _paths = new List<Path>();
+  //kn project requirement:
+  String _letterName;
+  //kn project requirement: setter for letter name
+  set letterName(String letterName) {this._letterName = letterName;}
 
   //TODO do proper parsing and support hex-alpa and RGBA
   Color parseColor(String cStr) {
@@ -107,6 +111,18 @@ class SvgParser {
         index++;
       }
     });
+    //kn project requirement: 
+    //this fetches data-name attribute to get the letter represented by the svg.
+    //this letter is used to calculate scaling factor for each svg letter based on letter width.
+        doc.findAllElements("svg")
+        .map((node) => node.attributes)
+        .forEach((attributes) {
+           var letter = attributes.firstWhere((attr) => attr.name.local == "data-name",
+          orElse: () => null);
+          this.letterName = letter.value;
+          });
+         
+    
   }
 
   void loadFromPaths(List<Path> paths) {
@@ -138,6 +154,10 @@ class SvgParser {
   /// Returns extracted [Path] elements of parsed Svg
   List<Path> getPaths() {
     return this._paths;
+  }
+  //kn project requirement: getter for the letter name
+  String getLetterName(){
+    return this._letterName;
   }
 }
 
