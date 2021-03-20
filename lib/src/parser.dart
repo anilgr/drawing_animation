@@ -15,7 +15,9 @@ class SvgParser {
   //kn project requirement:
   String _letterName;
   //kn project requirement: setter for letter name
-  set letterName(String letterName) {this._letterName = letterName;}
+  set letterName(String letterName) {
+    this._letterName = letterName;
+  }
 
   //TODO do proper parsing and support hex-alpa and RGBA
   Color parseColor(String cStr) {
@@ -31,7 +33,6 @@ class SvgParser {
           "Only hex color format currently supported. String:  $cStr");
     }
   }
-  
 
   //Extract segments of each path and create [PathSegment] representation
   void addPathSegments(Path path, int index, double strokeWidth, Color color) {
@@ -55,6 +56,7 @@ class SvgParser {
   }
 
   void loadFromString(String svgString) {
+    print(svgString);
     this._pathSegments.clear();
     int index = 0; //number of parsed path elements
     var doc = xml.parse(svgString);
@@ -63,30 +65,29 @@ class SvgParser {
         .findAllElements("path")
         .map((node) => node.attributes)
         .forEach((attributes) {
-
-          
-        //parse transformation attribute and get translate values if present. Which then be used as offset to moveTo in path.
-        List<double> translateValues = List<double>();
-        var tranformElement = attributes.firstWhere(
-            (attr) => attr.name.local == "transform",
-            orElse: () => null);
-        if (tranformElement != null) {
-          RegExp exp = RegExp(r"translate\(([^;]+)\)");
-          Match match = exp.firstMatch(tranformElement.value);
-          List<String> values = match.group(1).split(" "); //list will have dx at position 0 and dy at position 1 as string;  
-          values.forEach((value){
-              // print("printing the parsed translate value" + translateValues.toString());
-              translateValues.add(double.parse(value));
-          });
-        }
+      //parse transformation attribute and get translate values if present. Which then be used as offset to moveTo in path.
+      List<double> translateValues = List<double>();
+      var tranformElement = attributes.firstWhere(
+          (attr) => attr.name.local == "transform",
+          orElse: () => null);
+      if (tranformElement != null) {
+        RegExp exp = RegExp(r"translate\(([^;]+)\)");
+        Match match = exp.firstMatch(tranformElement.value);
+        List<String> values = match.group(1).split(
+            " "); //list will have dx at position 0 and dy at position 1 as string;
+        values.forEach((value) {
+          // print("printing the parsed translate value" + translateValues.toString());
+          translateValues.add(double.parse(value));
+        });
+      }
 
       var dPath = attributes.firstWhere((attr) => attr.name.local == "d",
           orElse: () => null);
       if (dPath != null) {
-
         //add translate offset values to the path.
-        if(translateValues != null && translateValues.isNotEmpty){
-          dPath.value = dPath.value.replaceFirstMapped(RegExp(r"M([^a-zA-Z]+),([^a-zA-Z]+)"), (match){
+        if (translateValues != null && translateValues.isNotEmpty) {
+          dPath.value = dPath.value.replaceFirstMapped(
+              RegExp(r"M([^a-zA-Z]+),([^a-zA-Z]+)"), (match) {
             // print(match.toString());
             var x = double.parse(match.group(1)) + translateValues[0];
             var y = double.parse(match.group(2)) + translateValues[1];
@@ -94,7 +95,6 @@ class SvgParser {
           });
         }
         // print(dPath.value);
-
 
         Path path = new Path();
         writeSvgPathDataToPath(dPath.value, new PathModifier(path));
@@ -142,18 +142,18 @@ class SvgParser {
         index++;
       }
     });
-    //kn project requirement: 
+    //kn project requirement:
     //this fetches data-name attribute to get the letter represented by the svg.
     //this letter is used to calculate scaling factor for each svg letter based on letter width.
-        doc.findAllElements("svg")
+    doc
+        .findAllElements("svg")
         .map((node) => node.attributes)
         .forEach((attributes) {
-           var letter = attributes.firstWhere((attr) => attr.name.local == "data-name",
+      var letter = attributes.firstWhere(
+          (attr) => attr.name.local == "data-name",
           orElse: () => null);
-          this.letterName = letter.value;
-          });
-         
-    
+      this.letterName = letter.value;
+    });
   }
 
   void loadFromPaths(List<Path> paths) {
@@ -172,6 +172,8 @@ class SvgParser {
 
   /// Parses Svg from provided asset path
   Future<void> loadFromFile(String file) async {
+    print(":::::::::" + file);
+
     this._pathSegments.clear();
     String svgString = await rootBundle.loadString(file);
     loadFromString(svgString);
@@ -186,8 +188,9 @@ class SvgParser {
   List<Path> getPaths() {
     return this._paths;
   }
+
   //kn project requirement: getter for the letter name
-  String getLetterName(){
+  String getLetterName() {
     return this._letterName;
   }
 }

@@ -154,7 +154,7 @@ abstract class AbstractAnimatedDrawingState extends State<AnimatedDrawing> {
     PathPainterBuilder builder =
         preparePathPainterBuilder(this.widget.lineAnimation);
     builder.setPathSegments(this.pathSegmentsToAnimate);
-    builder.setLetterName(this.letterName);//kn project requirement: 
+    builder.setLetterName(this.letterName); //kn project requirement:
     return builder.build();
   }
 
@@ -162,7 +162,7 @@ abstract class AbstractAnimatedDrawingState extends State<AnimatedDrawing> {
     if (pathSegmentsToPaintAsBackground.isEmpty) return null;
     PathPainterBuilder builder = preparePathPainterBuilder();
     builder.setPathSegments(this.pathSegmentsToPaintAsBackground);
-    builder.setLetterName(this.letterName);//kn project requirement: 
+    builder.setLetterName(this.letterName); //kn project requirement:
     return builder.build();
   }
 
@@ -266,8 +266,7 @@ abstract class AbstractAnimatedDrawingState extends State<AnimatedDrawing> {
   void parsePathData() {
     SvgParser parser = new SvgParser();
     if (svgAssetProvided()) {
-      if(this.widget.assetPath == this.assetPath)
-        return;
+      if (this.widget.assetPath == this.assetPath) return;
 
       parseFromSvgAsset(parser);
     } else if (pathsProvided()) {
@@ -289,6 +288,7 @@ abstract class AbstractAnimatedDrawingState extends State<AnimatedDrawing> {
   bool svgAssetProvided() => this.widget.assetPath.isNotEmpty;
 
   void parseFromSvgAsset(SvgParser parser) {
+    print("lisjdflksdjlfkjsldkf ----");
     parser.loadFromFile(this.widget.assetPath).then((_) {
       setState(() {
         //raw paths
@@ -296,7 +296,7 @@ abstract class AbstractAnimatedDrawingState extends State<AnimatedDrawing> {
         this.widget.paths.addAll(parser.getPaths());
         //corresponding segments
         this.pathSegments = parser.getPathSegments();
-        this.letterName = parser.getLetterName();//kn project requirement: 
+        this.letterName = parser.getLetterName(); //kn project requirement:
         this.assetPath = this.widget.assetPath;
       });
     });
@@ -304,7 +304,10 @@ abstract class AbstractAnimatedDrawingState extends State<AnimatedDrawing> {
 
   bool checkIfDefaultOrderSortingRequired() {
     // always keep paths for allAtOnce animation in original path order so we do not sort for the correct PaintOrder later on (which is pretty expensive for AllAtOncePainter)
-    final bool defaultSortingWhenNoOrderDefined = this.widget.lineAnimation == LineAnimation.allAtOnce && this.animationOrder != PathOrders.original;
-    return defaultSortingWhenNoOrderDefined || this.widget.lineAnimation == null;
+    final bool defaultSortingWhenNoOrderDefined =
+        this.widget.lineAnimation == LineAnimation.allAtOnce &&
+            this.animationOrder != PathOrders.original;
+    return defaultSortingWhenNoOrderDefined ||
+        this.widget.lineAnimation == null;
   }
 }
